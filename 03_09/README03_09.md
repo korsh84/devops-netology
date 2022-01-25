@@ -54,11 +54,12 @@ w3m https://korshdevops/index.html
 ![ресурсы](03_09_p10.png)
 
 9*. Установите и настройте фаервол ufw на web-сервер из задания 3. Откройте доступ снаружи только к портам 22,80,443
+```
 $ sudo ufw default deny incoming
 $ sudo ufw allow 22
 $ sudo ufw allow 80
 $ sudo ufw allow 443
 $ sudo ufw enable
-
+```
 ---
 
