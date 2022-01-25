@@ -5,6 +5,7 @@
 2. Установите Google authenticator на мобильный телефон. Настройте вход в Bitwarden акаунт через Google authenticator OTP.
 ![ресурсы](03_09_p2.png)
 3. Установите apache2, сгенерируйте самоподписанный сертификат, настройте тестовый сайт для работы по HTTPS.
+```bash
 sudo apt install apache2
 sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 -keyout /etc/ssl/private/apache-selfsigned.key \
@@ -30,6 +31,7 @@ sudo systemctl reload apache2
 echo "127.0.0.1     korshdevops" | sudo tee -a /etc/hosts
 
 w3m https://korshdevops/index.html
+```
 ![ресурсы](03_09_p3.png)
 
 4. Проверьте на TLS уязвимости произвольный сайт в интернете.
