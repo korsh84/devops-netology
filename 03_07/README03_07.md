@@ -6,8 +6,8 @@ vagrant@netology1:~$ ip -br link
 lo               UNKNOWN        00:00:00:00:00:00 <LOOPBACK,UP,LOWER_UP>
 eth0             UP             08:00:27:73:60:cf <BROADCAST,MULTICAST,UP,LOWER_UP>
 eth1             UP             08:00:27:e0:96:49 <BROADCAST,MULTICAST,UP,LOWER_UP>
-Для Windows - ipconfig
 ```
+   Для Windows - ipconfig
 
 2. Какой протокол используется для распознавания соседа по сетевому интерфейсу? Какой пакет и команды есть в Linux для этого?
    - протокол LLDP
@@ -56,5 +56,7 @@ eth1             UP             08:00:27:e0:96:49 <BROADCAST,MULTICAST,UP,LOWER_
  Инструкция по установке - https://github.com/svmyasnikov/eve-ng
 
  Выполните задания на lldp, vlan, bonding в эмуляторе EVE-ng. 
+ 
+ ![ресурсы](03_07_p8_1.png) ![ресурсы](03_07_p8_2.png) ![ресурсы](03_07_p8_3.png)
  
  ---
