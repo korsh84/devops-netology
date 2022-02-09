@@ -32,7 +32,7 @@ eth1             UP             08:00:27:e0:96:49 <BROADCAST,MULTICAST,UP,LOWER_
 
 4. Какие типы агрегации интерфейсов есть в Linux? Какие опции есть для балансировки нагрузки? Приведите пример конфига.
    - типы LAG - статический (cisco mode on) и динамический (cisco mode active)
-   -  в linux называется bonding, и предполагает создание нового сетевого интерфейса с кофигурацией на этапе запуска/перезагрузки интерфейса (ifdown/ifup)   
+   -  в linux называется bonding, и предполагает создание нового сетевого интерфейса с конфигурацией на этапе запуска/перезагрузки интерфейса (ifdown/ifup)   
 > modprobe bonding mode=balance-alb miimon=100 
 
 основная опция mode и варианты:  
@@ -42,7 +42,27 @@ eth1             UP             08:00:27:e0:96:49 <BROADCAST,MULTICAST,UP,LOWER_
    - broadcast (отправка через все интерфейсы одновременно), 
    - 802.3ad (динамическое аггрегирование на основе данных по скорости и поддерживаемым режимам), 
    - balance-tlb (исходящий трафик распрделяется равномерно по все интерфейсамб входящий принимается текущим), 
-   - balance-alb (включает tlb + балансировка входящего трафика)/
+   - balance-alb (включает tlb + балансировка входящего трафика).
+
+пример конфига (interfaces)
+```
+    auto bond0
+iface bond0 inet dhcp
+   bond-slaves none
+   bond-mode active-backup
+   bond-miimon 100
+
+auto eth0
+   iface eth0 inet manual
+   bond-master bond0
+   bond-primary eth0 eth1
+
+auto eth1
+iface eth1 inet manual
+   bond-master bond0
+   bond-primary eth0 eth1
+```
+    
 
 6. Сколько IP адресов в сети с маской /29 ? Сколько /29 подсетей можно получить из сети с маской /24. Приведите несколько примеров /29 подсетей внутри сети 10.10.10.0/24.
 > Hosts/Net: 6 + 1 broadcast + 1 адрес сети   
