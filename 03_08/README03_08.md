@@ -104,6 +104,25 @@ UNCONN               0                    0                                     
 
 6*. Установите Nginx, настройте в режиме балансировщика TCP или UDP.
 
+  - пример конфигов, если повесить ip на этот же сервер, то nginx будет выдавать ошибку 500, поскольку он будет проксировать запросы на себя. То есть это должны быть другие сервера.
+```bash
+> sudo vi /etc/nginx/nginx.conf`
+      http {
+        upstream korshproject1 {
+          server 172.30.1.5;
+          server 172.30.1.6;
+          server 172.30.1.7;
+        }
+      }
+> sudo vim /etc/nginx/sites-enabled/default`
+        server {
+          listen 80;
+          server_name korshproject.com;
+          location / {
+           proxy_pass http://korshproject1;
+          }
+        }
+```
 7*. Установите bird2, настройте динамический протокол маршрутизации RIP.
 
 8*. Установите Netbox, создайте несколько IP префиксов, используя curl проверьте работу API.
