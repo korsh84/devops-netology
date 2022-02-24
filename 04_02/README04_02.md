@@ -57,10 +57,9 @@ for result in result_os.split('\n'):
 import os
 import socket
 import re
-
+#new.lst - пишем результат текущей сессии, old.lst - результат прошлого запуска
 file = open("new.lst", "w")
 old_list = open('old.lst').read().splitlines()
-os.popen('cp new.lst old.lst')
 service_list = ['drive.google.com', 'mail.google.com', 'google.com']
 for host in service_list:
     current_ip = socket.gethostbyname(host)
@@ -72,6 +71,7 @@ for host in service_list:
     filt_list = filtered[0].split()
     if res1 not in old_list:
        print("[ERROR]", host, "IP mismatch:", current_ip, filt_list[2])
+os.popen('cp new.lst old.lst')
 ```
 ## Дополнительное задание (со звездочкой*) - необязательно к выполнению
 
