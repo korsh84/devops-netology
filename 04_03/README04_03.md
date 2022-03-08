@@ -133,8 +133,104 @@ google.com - 74.125.205.101
 
 ### Ваш скрипт:
 ```python
-???
+import yaml
+import sys
+import json
+import os
+import re
+
+name = os.path.splitext(sys.argv[1])[0]  # вырезаем имя
+ext = os.path.splitext(sys.argv[1])[1]  # вырезаем расширение
+#print(name)
+#print(ext)
+# проверка препутанных расширений
+full_file = open(sys.argv[1], "r")
+each_line = full_file.read().replace('\n', '') # зачитаем весь файл в одну строку убирая переносы
+full_file.close()
+for item in each_line: #  поиск первого печатаемого (\S) символа в строке
+    if re.match(r'\S', item):
+       break
+#print(item) #, end='')
+
+# проверяем только первый печатный символ если он равен { а расширение не json, то меняем
+if (item != '{'):
+    if (ext == '.json'):
+        print("change to .yml")
+        if os.path.exists(f'{name}.yml'):
+            os.remove(f'{name}.yml')
+        os.rename(sys.argv[1],f'{name}.yml')
+        ext = '.yml'
+else:
+    if (ext == '.yml'):
+        print("change to .json")
+        if os.path.exists(f'{name}.json'):
+            os.remove(f'{name}.json')
+        os.rename(sys.argv[1], f'{name}.json')
+        ext = '.json'
+#print(ext)
+
+
+### конверсия
+if ext == '.json':
+    OUT = open(f'{name}.yml', 'w')
+    with open(f'{name}.json', 'r') as IN:
+        try:
+            JSON = json.load(IN)
+        except json.JSONDecodeError as er :
+            print("JSON format error:")
+            print(er)
+        else:
+            yaml.dump(JSON, OUT)
+            OUT.close()
+
+elif ext == '.yml':
+     OUT = open(f'{name}.json', 'w')
+     with open(f'{name}.yml', 'r') as IN:
+         try:
+             YAML = yaml.safe_load(IN)
+         except yaml.YAMLError as er:
+             print("YAML format error:")
+             print(er)
+         else:
+             json.dump(YAML, OUT)
+             OUT.close()
+else:
+    print("Format error:", ext)
 ```
 
 ### Пример работы скрипта:
-???
+```bash
+#Ошибочные
+$ python 0403_4.py test.yml
+change to .json
+.json
+$ python 0403_4.py test.json
+change to .yml
+.yml
+#неправильное расширение
+$ python 0403_4.py 0403_4.py
+Format error: .py
+нормальные 
+$ python 0403_4.py test.json
+#test.json на входе
+{"elements": [{"ip": 7175, "name": "first", "type": "server"}, {"ip": "71.78.22.43", "name": "second", "type": "proxy"}], "info": "Sample JSON output from our service\t"}
+#test.yml на выходе
+elements:
+- ip: 7175
+  name: first
+  type: server
+- ip: 71.78.22.43
+  name: second
+  type: proxy
+info: "Sample JSON output from our service\t"
+#ошибка синтаксиса
+$ python 0403_4.py test.json
+JSON format error:
+Expecting ':' delimiter: line 1 column 131 (char 130)
+###
+$ python 0403_4.py test.yml
+YAML format error:
+mapping values are not allowed here
+  in "test.yml", line 3, column 7
+
+```
