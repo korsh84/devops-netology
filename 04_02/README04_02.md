@@ -75,39 +75,59 @@ Not repo
 1. Наша команда разрабатывает несколько веб-сервисов, доступных по http. Мы точно знаем, что на их стенде нет никакой балансировки, кластеризации, за DNS прячется конкретный IP сервера, где установлен сервис. Проблема в том, что отдел, занимающийся нашей инфраструктурой очень часто меняет нам сервера, поэтому IP меняются примерно раз в неделю, при этом сервисы сохраняют за собой DNS имена. Это бы совсем никого не беспокоило, если бы несколько раз сервера не уезжали в такой сегмент сети нашей компании, который недоступен для разработчиков. Мы хотим написать скрипт, который опрашивает веб-сервисы, получает их IP, выводит информацию в стандартный вывод в виде: <URL сервиса> - <его IP>. Также, должна быть реализована возможность проверки текущего IP сервиса c его IP из предыдущей проверки. Если проверка будет провалена - оповестить об этом в стандартный вывод сообщением: [ERROR] <URL сервиса> IP mismatch: <старый IP> <Новый IP>. Будем считать, что наша разработка реализовала сервисы: drive.google.com, mail.google.com, google.com.
 ### Ваш скрипт:  
 ```python
-#!F:\Docs\2021_devops\pythonProject\venv\Scripts\python.exe
 import os
 import socket
-import re
-file = open("new.lst", "w")
-old_list = open('old.lst').read().splitlines()
+import pickle
+
+host_dict_old = {} # словарь старых занчений
+host_dict = {} # текущих
+
 service_list = ['drive.google.com', 'mail.google.com', 'google.com']
+
+## генерация file.pkl для первого запуска
+if os.path.exists('file.pkl') == 0:
+    file_old = open("file.pkl", "wb")
+    for host in service_list:
+        current_ip = socket.gethostbyname(host)
+        host_dict[host] = current_ip
+    pickle.dump(host_dict, file_old)
+    file_old.close()
+host_dict.clear()
+
+# загрузка старых значений
+f = open("file.pkl","rb")
+host_dict_old = pickle.load(f)
+f.close()
+
 for host in service_list:
     current_ip = socket.gethostbyname(host)
+    host_dict[host] = current_ip
     current_result = [host, "-", current_ip]
     res1 = ' '.join(current_result)
-    file.write(res1+ '\n')
     print(res1)
-    filtered = [x for x in old_list if re.match(host, x)]
-    filt_list = filtered[0].split()
-    if res1 not in old_list:
-       print("[ERROR]", host, "IP mismatch:", current_ip, filt_list[2])
-os.popen('cp new.lst old.lst')
+    if host_dict_old[host] != host_dict[host]:
+        print("[ERROR]", host, "IP mismatch:", current_ip, host_dict_old[host])
+
+# сохраним старые значения
+f = open("file.pkl","wb")
+pickle.dump(host_dict,f)
+f.close()
 ```
 ### Вывод скрипта при запуске при тестировании:
 ```
-$ python.exe 0402_4.py
-drive.google.com - 209.85.233.194
-[ERROR] drive.google.com IP mismatch: 209.85.233.194 64.233.162.194
-mail.google.com - 142.251.1.17
-[ERROR] mail.google.com IP mismatch: 142.251.1.17 74.125.131.83
-google.com - 74.125.205.102
+$ python 42v2.py
+drive.google.com - 64.233.165.194
+mail.google.com - 142.251.1.83
+[ERROR] mail.google.com IP mismatch: 142.251.1.83 142.250.150.83
+google.com - 74.125.131.102
+
 
 # сразу второй запуск
-$ python.exe 0402_4.py
-drive.google.com - 209.85.233.194
-mail.google.com - 142.251.1.17
-google.com - 74.125.205.102
+$ python 42v2.py
+drive.google.com - 64.233.165.194
+mail.google.com - 142.251.1.83
+google.com - 74.125.131.102
+
 ```
 
 
