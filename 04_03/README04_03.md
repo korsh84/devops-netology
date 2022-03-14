@@ -45,8 +45,6 @@
 
 ### Ваш скрипт:
 ```python
-#!F:\Docs\2021_devops\pythonProject\venv\Scripts\python.exe
-
 import os
 import socket # модуль для получения ip
 import re # обработка regexp
@@ -54,23 +52,32 @@ import yaml
 import json
 # открываем/создаем файлы лдля текущего запуска + предполагается, что старые ip лежат в файле old.lst
 file = open("new.lst", "w")
+service_list = ["drive.google.com", "mail.google.com", "google.com"]
+json_dict = {}
+
+## делаем чистые файлы
 filej = open("list.json", "w")
 filey = open("list.yaml", "w")
+filej.close()
+filey.close()
 
-filej.write('{  ')  #  пишем открывающую скобку в json
+
+## генерация old.lst для первого запуска
+if os.path.exists('old.lst') == 0:
+    file_old = open("old.lst", "w")
+    for host in service_list:
+        current_ip = socket.gethostbyname(host)  # получили текущий ip
+        current_result = [host, "-", current_ip]  # составили строку как для прошлого дз
+        res1 = ' '.join(current_result)  # делаем строку старого формата
+        file_old.write(res1 + '\n')
+    file_old.close()
+
 old_list = open('old.lst').read().splitlines()  # открываем построчно
-service_list = ['drive.google.com', 'mail.google.com', 'google.com']
+
 for host in service_list:
     current_ip = socket.gethostbyname(host) # получили текущий ip
     current_result = [host, "-", current_ip] # составили строку как для прошлого дз
-    current_json = ["\"", host, "\": \"", current_ip, "\""]  # составили элементы строки json
-    current_yaml = ["- ", host, ": ", current_ip]   # составили элементы строки yaml
-    json1 = ''.join(current_json)  #  склеиваем в одну строку без разделителей
-    yaml1 = ''.join(current_yaml) #  склеиваем в одну строку без разделителей
-   # print(json1) # для отладки
-   # print(yaml1)
-    filej.write(json1 + ', ')  # запись в файл с , в конце
-    filey.write(yaml1 + '\n')  # запись в файл с переносом в конце
+    json_dict[host] = current_ip
     res1 = ' '.join(current_result) # делаем строку старого формата
     file.write(res1 + '\n')
     print(res1)
@@ -78,47 +85,51 @@ for host in service_list:
     filt_list = filtered[0].split() # разделяем первую найденную строку на слова
     if res1 not in old_list:  # если новая строка не совпадает со старым файлом
         print("[ERROR]", host, "IP mismatch:", current_ip, filt_list[2])  # выводим сообщение
-filej.write('}')
-filej.close()
+
+### словарь для форматирования по заданию
+val = {}
+for k,v in json_dict.items():
+    filej = open("list.json", "a")
+    filey = open("list.yaml", "a")
+    val[k] = v
+    json.dump(val, filej)
+    yaml.dump([val], filey)
+    val.clear()
+
+
 os.popen('cp new.lst old.lst')
-# удаление лишней запятой
-with open("list.json", 'r+') as f:
-    text = f.read()  # зачитка содержимого
-    text = re.sub(', }', ' }', text)  # замена по шаблону последней запятой
-    f.seek(0)  # место запись измененного содержимого с начала файла
-    f.write(text)  # сама запись
-    f.truncate()  # обрезает остаток если новое содержимое короче
-    f.close()
+filej.close()
+filey.close()
+
 ```
 
 ### Вывод скрипта при запуске при тестировании:
 ```
 #1 запуск
-$ python.exe 0403_2.py
-drive.google.com - 108.177.14.194
-[ERROR] drive.google.com IP mismatch: 108.177.14.194 209.85.233.194
-mail.google.com - 74.125.131.17
-[ERROR] mail.google.com IP mismatch: 74.125.131.17 142.251.1.17
-google.com - 74.125.205.101
-[ERROR] google.com IP mismatch: 74.125.205.101 74.125.205.102
+$ python 04v3.py
+drive.google.com - 142.251.1.194
+[ERROR] drive.google.com IP mismatch: 142.251.1.194 64.233.164.194
+mail.google.com - 173.194.73.17
+[ERROR] mail.google.com IP mismatch: 173.194.73.17 142.251.1.19
+google.com - 74.125.205.100
+
 #2 запуск
-$ python.exe 0403_2.py
-drive.google.com - 173.194.222.194
-[ERROR] drive.google.com IP mismatch: 173.194.222.194 108.177.14.194
-mail.google.com - 74.125.131.17
-google.com - 74.125.205.101
+$ python 04v3.py
+drive.google.com - 142.251.1.194
+mail.google.com - 173.194.73.17
+google.com - 74.125.205.100
 ```
 
 ### json-файл(ы), который(е) записал ваш скрипт:
 ```json
-{  "drive.google.com": "108.177.14.194", "mail.google.com": "74.125.131.17", "google.com": "74.125.205.101" }
+{"drive.google.com": "142.251.1.194"}{"mail.google.com": "173.194.73.17"}{"google.com": "74.125.205.100"}
 ```
 
 ### yml-файл(ы), который(е) записал ваш скрипт:
 ```yaml
-- drive.google.com: 108.177.14.194
-- mail.google.com: 74.125.131.17
-- google.com: 74.125.205.101
+- drive.google.com: 142.251.1.194
+- mail.google.com: 173.194.73.17
+- google.com: 74.125.205.100
 ```
 
 ## Дополнительное задание (со звездочкой*) - необязательно к выполнению
