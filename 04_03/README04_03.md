@@ -93,7 +93,8 @@ for k,v in json_dict.items():
     filey = open("list.yaml", "a")
     val[k] = v
     json.dump(val, filej)
-    yaml.dump([val], filey)
+    filej.write('\n') # каждый объект на отдельной строке
+    yaml.dump([val], filey) # форматирование согласно заданию
     val.clear()
 
 
@@ -122,7 +123,9 @@ google.com - 74.125.205.100
 
 ### json-файл(ы), который(е) записал ваш скрипт:
 ```json
-{"drive.google.com": "142.251.1.194"}{"mail.google.com": "173.194.73.17"}{"google.com": "74.125.205.100"}
+{"drive.google.com": "142.251.1.194"}
+{"mail.google.com": "173.194.73.17"}
+{"google.com": "74.125.205.100"}
 ```
 
 ### yml-файл(ы), который(е) записал ваш скрипт:
