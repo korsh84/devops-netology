@@ -79,12 +79,11 @@ import os
 import socket
 import pickle
 
-host_dict_old = {} # словарь старых занчений
-host_dict = {} # текущих
+host_dict = {}
 
 service_list = ['drive.google.com', 'mail.google.com', 'google.com']
 
-## генерация file.pkl для первого запуска
+# генерация file.pkl для первого запуска
 if os.path.exists('file.pkl') == 0:
     file_old = open("file.pkl", "wb")
     for host in service_list:
@@ -95,22 +94,22 @@ if os.path.exists('file.pkl') == 0:
 host_dict.clear()
 
 # загрузка старых значений
-f = open("file.pkl","rb")
-host_dict_old = pickle.load(f)
+f = open("file.pkl", "rb")
+host_dict = pickle.load(f)
 f.close()
 
 for host in service_list:
     current_ip = socket.gethostbyname(host)
-    host_dict[host] = current_ip
     current_result = [host, "-", current_ip]
     res1 = ' '.join(current_result)
     print(res1)
-    if host_dict_old[host] != host_dict[host]:
-        print("[ERROR]", host, "IP mismatch:", current_ip, host_dict_old[host])
+    if host_dict[host] != current_ip:
+        print("[ERROR]", host, "IP mismatch: old-", host_dict[host], current_ip)
+    host_dict[host] = current_ip
 
 # сохраним старые значения
-f = open("file.pkl","wb")
-pickle.dump(host_dict,f)
+f = open("file.pkl", "wb")
+pickle.dump(host_dict, f)
 f.close()
 ```
 ### Вывод скрипта при запуске при тестировании:
@@ -118,8 +117,8 @@ f.close()
 $ python 42v2.py
 drive.google.com - 64.233.165.194
 mail.google.com - 142.251.1.83
-[ERROR] mail.google.com IP mismatch: 142.251.1.83 142.250.150.83
 google.com - 74.125.131.102
+[ERROR] mail.google.com IP mismatch: old- 142.251.1.83 142.250.150.83
 
 
 # сразу второй запуск
